@@ -1,0 +1,231 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+:root {
+  --white: hsl(0, 0%, 100%);
+  --black: hsl(0, 0%, 30%);
+  --blacker: hsl(0, 0%, 10%);
+  --gray: hsl(0, 0%, 70%); 
+  --light-gray: hsl(0, 0%, 90%)
+}
+
+p {
+  color: var(--blacker);
+}
+
+button:not(#close), #generate-btn{
+  padding: 6px 14px;
+  font-weight: 400;
+  border-radius: 8px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+button.on {
+  transition: all 0.5s;
+}
+
+header{
+  background-color: var(--white);
+  padding-block: 12px 8px;
+  padding-inline: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0px 0px 10px hsl(0 0% 0% / 0.5 );
+}
+
+#title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+#title div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo-img {
+  width: 40px;
+}
+
+.github-img {
+  width: 25px;
+}
+
+#generate-btn {
+  color: var(--white);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 100px;
+  user-select: none;
+
+  background: linear-gradient(45deg,#ff3e25, #2fc561, #ffae00, #dd5a22, #2d75d3);
+  background-size: 500% 500%;
+  background-position: 20%;
+
+  animation: hue-rotate 5s infinite linear;
+  transition: font-weight 0.15s;
+}
+
+#generate-btn:active {
+  color: var(--white);
+  font-weight: 400;
+}
+
+#color-quant {
+  user-select: none;
+}
+
+#schemes {
+  display: flex;
+  align-items: center;
+}
+
+.schemes-btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.schemes-btns button {
+  background-color: var(--light-gray);
+  font-size: 12px;
+}
+
+.schemes-btns button.on {
+  color: var(--white);
+  background-color: var(--black);
+  box-shadow: 1px 1px 5px hsl(0 0% 0% / 0.3 );
+}
+
+#hide-show-btn {
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+#hide-show-btn .arrow {
+  width: 16px;
+}
+
+#main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /*  !  */
+  gap: 0;
+  position: absolute;
+  inset: 0;
+  z-index: -100;
+}
+
+.color {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+
+.color div{ 
+  color: var(--black);
+  font-size: 20px;
+}
+
+.color:hover div{
+  display: block;
+}
+
+.color .code {
+  font-weight: 600;
+  font-size: 18px;
+  transition: color 0.15s, background-color 0.3s, box-shadow 0.3s;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+
+.color .code:hover {
+  background-color: hsl(220 20% 60% / 0.2);
+  box-shadow: 0px 0px 8px hsl(0 0% 0% / 0.3 );
+}
+
+#tip {
+  position: absolute;
+  top: 25%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--white);
+  padding: 12px 20px;
+  border-radius: 0px 10px 10px 0px;
+  font-size: 14px;
+  box-shadow:1px 1px 8px hsl(0 0% 0% / 0.5 );
+  transition: transform 0.7s; 
+}
+
+.close-img {
+  width: 11px;
+  height: 11px;
+}
+
+#close {
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+}
+
+
+/* Animation */
+
+@keyframes hue-rotate {
+  from {
+    -webkit-filter: hue-rotate(0);
+    -moz-filter: hue-rotate(0);
+    -ms-filter: hue-rotate(0);
+    filter: hue-rotate(0);
+  }
+  to {
+    -webkit-filter: hue-rotate(360deg);
+    -moz-filter: hue-rotate(360deg);
+    -ms-filter: hue-rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+.hide {
+  transform: translateY(-80%);
+  transition: transform 0.7s;
+}
+
+.show {
+  transform: translateY(0px);
+  transition: transform 0.7s;
+}
+
+.tip-off {
+  transform: translateX(-110%);
+}
+
+.tip-on {
+  transform: translateX(0px);
+}

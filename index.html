@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <script src = "index.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <title>Colora</title>
+</head>
+<body>
+  <header class = "show">
+    <div id="title">
+      <div>
+        <img src = "images/Logo.svg" class = "logo-img">
+        <p>Colora</p>
+      </div>
+      <a href = "https://github.com/figueiredoUm"><img class = "github-img" src="images/github.svg"></a>
+    </div>
+      <div class="schemes-btns">
+
+        <label for="color-quantity">Quantity</label>
+        <select name="color-quantity" id="color-quant" onchange="setColorQuant();">
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+
+        <button id = "default" class = "scheme on" onclick = "selectScheme(1);">Default</button>
+        <button id = "mono" class = "scheme off" onclick = "selectScheme(2);">Monochromatic</button>
+        <button id = "analogous" class = "scheme off" onclick = "selectScheme(3);">Analogous</button>
+      </div>
+      <a id = "generate-btn" onclick = "genPalette();">Generate</a>
+    </div>
+    <div id = "schemes">
+    <a id = "hide-show-btn" class = "show" onclick = "hideShow();"><img class = "arrow" src = "images/arrowUp.svg"></a>
+  </header>
+
+  <div id = "tip" class = "tip-off">
+    <img class = "tip-img" src = "images/tip.svg">
+    <p>Press 'Spacebar' to generate</p>
+    <button id = "close" onclick = "closeTip();">
+      <img class = "close-img" src = "images/close.svg">
+    </button>
+  </div>
+
+  <main id = "main">
+    <div class = "color">
+      <p class = "code"></p>
+    </div>
+    <div class = "color">
+      <p class = "code"></p>
+    </div>
+    <div class = "color">
+      <p class = "code"></p>
+    </div>
+
+  </main>
+
+  
+</body>
+</html>
