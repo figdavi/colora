@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,37 +11,51 @@
   <title>Colora</title>
 </head>
 <body>
-  <header class = "show">
-    <div id="title">
-      <div>
-        <img src = "images/Logo.svg" class = "logo-img">
+  <header class = "on">
+    <div id="upper">
+      <div id = "title">
+        <img src = "images/logo.svg" class = "logo-img">
         <p>Colora</p>
       </div>
-      <a href = "https://github.com/figueiredoUm"><img class = "github-img" src="images/github.svg"></a>
-    </div>
-      <div class="schemes-btns">
+      <nav>
 
-        <label for="color-quantity">Quantity</label>
-        <select name="color-quantity" id="color-quant" onchange="setColorQuant();">
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-        </select>
+        <a href = "https://github.com/figueiredoUm">
+          <img class = "github-img" src="images/github.svg">
+          <p></p>
+        </a>
 
-        <button id = "default" class = "scheme on" onclick = "selectScheme(1);">Default</button>
-        <button id = "mono" class = "scheme off" onclick = "selectScheme(2);">Monochromatic</button>
-        <button id = "analogous" class = "scheme off" onclick = "selectScheme(3);">Analogous</button>
-      </div>
-      <a id = "generate-btn" onclick = "genPalette();">Generate</a>
+        <div id = "language-options">
+          <div class = "language" onclick = "switchLanguage(1);">
+            <img src = "images/en.png">
+          </div>
+          <div class = "language" onclick = "switchLanguage(2);">
+            <img src = "images/pt-br.png">
+          </div>
+        </div>
+      </nav>
     </div>
-    <div id = "schemes">
-    <a id = "hide-show-btn" class = "show" onclick = "hideShow();"><img class = "arrow" src = "images/arrowUp.svg"></a>
+
+    <div id="schemes">
+
+      <select name="color-quantity" id="color-quant" onchange="setColorQuant();">
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
+
+      <button id = "default" class = "scheme selected" onclick = "select(schemeElements, 1);">Padrão</button>
+      <button id = "mono" class = "scheme" onclick = "select(schemeElements, 2);">Monocromático</button>
+      <button id = "analogous" class = "scheme" onclick = "select(schemeElements, 3);">Análogo</button>
+    </div>
+
+      <a id = "generate-btn" onclick = "genPalette();">Gerar Paleta</a>
+    <img onclick = "toggleHeader();" class = "header-arrow-img" src = "images/arrowUp.svg">
   </header>
 
-  <div id = "tip" class = "tip-off">
+  <div id = "tip" class = "off">
     <img class = "tip-img" src = "images/tip.svg">
-    <p>Press 'Spacebar' to generate</p>
+    <p>Pressione 'Espaço' para gerar</p>
     <button id = "close" onclick = "closeTip();">
       <img class = "close-img" src = "images/close.svg">
     </button>

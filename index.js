@@ -3,10 +3,11 @@ let colorElements = document.getElementsByClassName('color');
 let schemeElements = document.getElementsByClassName('scheme');
 let colorCode = document.getElementsByClassName('code');
 let header = document.querySelector('header');
-let hideShowBtn = document.getElementById('hide-show-btn');
+let headerArrowImg = document.querySelector('.header-arrow-img');
 let tipElement = document.getElementById('tip');
 let colorQuantSelect = document.getElementById('color-quant');
 let mainElement = document.getElementById('main');
+let languageElements = document.getElementsByClassName('language');
 
 let colorQuant = colorQuantSelect.value;
 
@@ -23,10 +24,31 @@ let tipShown = 0;
 
 document.querySelector('body').onload = genPalette;
 
+//Language Display
+
+function switchLanguage(number) {
+  switch(number) {
+    case 1: // English
+      document.getElementById('default').innerText = 'Default';
+      document.getElementById('mono').innerText = 'Monochromatic';
+      document.getElementById('analogous').innerText = 'Analogous';
+      document.getElementById('generate-btn').innerText = 'Generate Palette';
+      document.querySelector('#tip p').innerText = 'Press \'Spacebar\' to generate';
+      break;
+  
+    case 2: // Português
+      document.getElementById('default').innerText = 'Padrão';
+      document.getElementById('mono').innerText = 'Monocromático';
+      document.getElementById('analogous').innerText = 'Análogo';
+      document.getElementById('generate-btn').innerText = 'Gerar Paleta';
+      document.querySelector('#tip p').innerText = 'Pressione \'Espaço\' para gerar';
+      break;
+  }
+}
+
 //Set Quantity of Colors in the palette
 
 function setColorQuant() {
-  console.log('working');
   colorQuant = colorQuantSelect.value;
   mainElement.innerHTML = '';
   for(let i = 0; i < colorQuant; i++) {
@@ -38,21 +60,24 @@ function setColorQuant() {
   genPalette();
 }
 
-//Scheme Selection
+//Select Function
 
 let scheme = 1;
 
-function selectScheme(number) {
-  scheme = number;
-  currentElement = schemeElements[number-1];
-
-  for(let i = 0; i < schemeElements.length; i++) {
-      schemeElements[i].classList.remove('on');
-      schemeElements[i].classList.add('off');
+function select(element, number) {
+  if(element[number-1].classList.contains('selected')) {
+    return;
   }
-    currentElement.classList.remove('off');
-    currentElement.classList.add('on');
-  
+  currentElement = element[number-1];
+
+  for(let i = 0; i < element.length; i++) {
+      element[i].classList.remove('selected');
+  }
+  element[number-1].classList.add('selected');
+
+  if(element === schemeElements) {
+    scheme = number;
+  }
 }
 
 //Generation Functions
@@ -61,26 +86,21 @@ function genPalette() {
   genCount++;
   switch(scheme) {
     case 1:
-      console.log("default selected");
       genDefault();
       break;
 
     case 2: 
-      console.log("mono selected");
       genMono(); 
       break; 
 
     case 3:
-      console.log("analogous selected");
       genAnalogous();
       break;
 
     case 4:
-      console.log("3 selected");
       break;
 
     case 5:
-      console.log("4 selected");
       break;
   }
   for(i = 0; i < colorQuant; i++) {
@@ -99,10 +119,9 @@ function genPalette() {
       colorCodeP[i] = 1;
     }
   }
-  console.log(genCount);
-  if(genCount > 4 && tipShown === 0) {
-    tipElement.classList.remove('tip-off');
-    tipElement.classList.add('tip-on');
+  if(genCount > 4 && tipShown === 0 && !navigator.userAgentData.mobile) {
+    tipElement.classList.remove('off');
+    tipElement.classList.add('on');
   }
 }
 
@@ -162,24 +181,24 @@ function genAnalogous() {
 
 //Other Button Functions
 
-function hideShow(){
-  if(header.classList.contains('show')) {
-    header.classList.remove('show');
-    header.classList.add('hide');
-    hideShowBtn.innerHTML = '<img class = "arrow" src = "images/arrowDown.svg">'
+function toggleHeader(){
+  if(header.classList.contains('on')) {
+    header.classList.remove('on');
+    header.classList.add('off');
+    headerArrowImg.src = 'images/arrowDown.svg';
   } else {
-    header.classList.remove('hide');
-    header.classList.add('show');
-    hideShowBtn.innerHTML = '<img class = "arrow" src = "images/arrowUp.svg">'
+    header.classList.remove('off');
+    header.classList.add('on');
+    headerArrowImg.src = 'images/arrowUp.svg';
   }
 }
 
 document.addEventListener('keyup', event => {
   if (event.code === 'Space') {
     genPalette();
-    if(tipElement.classList.contains('tip-on') && spaceCount > 2){
-      tipElement.classList.remove('tip-on');
-      tipElement.classList.add('tip-off');
+    if(tipElement.classList.contains('on') && spaceCount > 0){
+      tipElement.classList.remove('on');
+      tipElement.classList.add('off');
       tipShown = 1;
     }
     genCount++; 
@@ -188,8 +207,8 @@ document.addEventListener('keyup', event => {
 });
 
 function closeTip() {
-  tipElement.classList.remove('tip-on');
-  tipElement.classList.add('tip-off');
+  tipElement.classList.remove('on');
+  tipElement.classList.add('off');
   tipShown = 1;
 }
 
@@ -219,7 +238,7 @@ function hslToHex(h, s, l) {
   const f = n => {
     const k = (n + h / 30) % 12;
     const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+    return Math.round(255 * color).toString(16).padStart(2, '0');
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 }
