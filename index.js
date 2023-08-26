@@ -1,68 +1,165 @@
-let btnElement = document.getElementById('generate-btn');
-let colorElements = document.getElementsByClassName('color');
-let schemeElements = document.getElementsByClassName('scheme');
-let colorCode = document.getElementsByClassName('code');
-let header = document.querySelector('header');
-let headerArrowImg = document.querySelector('.header-arrow-img');
-let tipElement = document.getElementById('tip');
-let colorQuantSelect = document.getElementById('color-quant');
-let mainElement = document.getElementById('main');
-let languageElements = document.getElementsByClassName('language');
+// Constants and Objects
+const COLOR_QUANT = 5;
 
-let colorQuant = colorQuantSelect.value;
+let scheme = 1;
+let hexCode = new Array(COLOR_QUANT);
 
-let hueArray = new Array(colorQuant);
-let saturationArray = new Array(colorQuant);
-let lightnessArray = new Array(colorQuant);
+const color = Array.from({ length: COLOR_QUANT }, () => ({
+  hue: 0,
+  saturation: 0,
+  lightness: 0
+}));
 
-let hexCode = new Array(colorQuant);
-let colorCodeP = new Array(colorQuant);
+const counters = JSON.parse(localStorage.getItem('counters')) || {
+  space: 0,
+  gen: 0,
+  tipShown: 0
+};
 
-let genCount = 0;
-let spaceCount = 0;
-let tipShown = 0;
-
-document.querySelector('body').onload = genPalette;
-
-//Language Display
-
-function switchLanguage(number) {
-  switch(number) {
-    case 1: // English
-      document.getElementById('default').innerText = 'Default';
-      document.getElementById('mono').innerText = 'Monochromatic';
-      document.getElementById('analogous').innerText = 'Analogous';
-      document.getElementById('generate-btn').innerText = 'Generate Palette';
-      document.querySelector('#tip p').innerText = 'Press \'Spacebar\' to generate';
-      break;
-  
-    case 2: // Português
-      document.getElementById('default').innerText = 'Padrão';
-      document.getElementById('mono').innerText = 'Monocromático';
-      document.getElementById('analogous').innerText = 'Análogo';
-      document.getElementById('generate-btn').innerText = 'Gerar Paleta';
-      document.querySelector('#tip p').innerText = 'Pressione \'Espaço\' para gerar';
-      break;
-  }
+function clearCounters() {
+  counters.space = 0;
+  counters.gen = 0;
+  counters.tipShown = 0;
+  localStorage.removeItem('counters');
 }
 
-//Set Quantity of Colors in the palette
 
-function setColorQuant() {
-  colorQuant = colorQuantSelect.value;
-  mainElement.innerHTML = '';
-  for(let i = 0; i < colorQuant; i++) {
-    mainElement.innerHTML += `<div class = "color">
-    <p class = "code"></p>
-  </div>`;
-  }
-  mainElement.style.gridTemplateColumns = `repeat(${colorQuant}, 1fr)`;
+// DOM Elements
+const languageElements = document.querySelectorAll('.language');
+const languageDropdownImg = document.querySelector('.language-img');
+const colorPicker = document.getElementById('color-picker');
+const colorPickerText = document.querySelector('#color-picker .text');
+const colorPickerInput = document.querySelector('#color-picker input');
+const tipElement = document.getElementById('tip');
+const colorElements = document.querySelectorAll('.color');
+const colorCodes = document.querySelectorAll('.code');
+const randomBtn = document.querySelector('.random-btn');
+const schemeElements = document.querySelectorAll('.scheme');
+const currentSchemeText = document.querySelector('.dropdown-scheme-btn p');
+const menuArrow = document.querySelector('.menu-arrow')
+
+
+// Event Listeners
+document.querySelector('body').onload = pickColor;
+colorPickerInput.addEventListener('input', pickColor);
+randomBtn.onclick = randomColor;
+
+document.addEventListener('click', handleDropdown);
+menuArrow.addEventListener('click', handleMenuClick);
+
+window.onkeyup = handleSpacebar;
+window.onkeydown = preventSpacebarDefault;
+
+document.querySelector(".close-tip").onclick = closeTip;
+
+schemeElements.forEach((button, index) => {
+  button.addEventListener('click', () => {
+    handleSchemeSelection(index);
+  });
+});
+
+languageElements.forEach((button, index) => {
+  button.addEventListener('click', () => {
+    handleLanguageSelection(index);
+  });
+});
+
+colorElements.forEach((div, index) => {
+  div.addEventListener('click', () => {
+    handleCodeCopy(index);
+  });
+});
+
+
+
+//Event Listeners Functions
+
+function pickColor() {
+  let colorPickerValue = colorPickerInput.value;
+  
+  [color[0].hue, color[0].saturation, color[0].lightness] = hexToHSL(colorPickerValue);
+
+  colorPicker.style.backgroundColor = colorPickerValue;
+
+  // contrastColor also returns a value
+  let strokeColor = contrastColor(colorPickerValue, colorPickerText);
+
+  document.querySelector('#color-picker svg').setAttribute('stroke', strokeColor);
+
   genPalette();
 }
 
-//Select Function
+function randomColor() {
+  counters.gen++;
+  let randomHue = Math.random() * 360;
+  let randomSaturation = randomBetween(40, 90);
+  let randomLightness = randomBetween(30, 90);
+  colorPickerInput.value = hslToHex(randomHue, randomSaturation, randomLightness);
 
-let scheme = 1;
+  pickColor();
+}
+
+function handleDropdown(e) {
+  let dropDownBtn = e.target.matches('[data-dropdown-btn]');
+
+  if (!dropDownBtn && e.target.closest('[data-dropdown]') != null) {
+    return;
+  }
+  let currentDropdown;
+  if (dropDownBtn) {
+    currentDropdown = e.target.closest('[data-dropdown]');
+    currentDropdown.classList.toggle('active');
+  }
+  document.querySelectorAll("[data-dropdown].active").forEach(dropdown => {
+    if (dropdown === currentDropdown) {
+      return;
+    }
+    dropdown.classList.remove('active');
+  });
+}
+
+function handleMenuClick() {
+  if (menu.classList.contains('off')) {
+    menuArrow.src = 'images/arrowUp.svg';
+  } else {
+    menuArrow.src = 'images/arrowDown.svg';
+  }
+  document.getElementById('menu').classList.toggle('off');
+}
+
+function handleSpacebar(e) {
+  if (e.code === 'Space') {
+    randomColor();
+    if(counters.space > 0) {
+      tipElement.classList.remove('on');
+      counters.tipShown = 1;
+    }
+    counters.space++;
+  }
+}
+
+function preventSpacebarDefault(e) {
+  if (e.code === 'Space') {
+    e.preventDefault();
+  }
+}
+
+function closeTip() {
+  tipElement.classList.remove('on');
+  counters.tipShown = 1;
+  localStorage.setItem('counters', JSON.stringify(counters));
+}
+
+function handleSchemeSelection(index) {
+  scheme = index + 1;
+  currentSchemeText.textContent = schemeElements[index].textContent;
+  select(schemeElements, scheme);
+}
+
+function handleLanguageSelection(index) {
+  select(languageElements, index + 1);
+  switchLanguage(index + 1);
+}
 
 function select(element, number) {
   if(element[number-1].classList.contains('selected')) {
@@ -74,162 +171,245 @@ function select(element, number) {
       element[i].classList.remove('selected');
   }
   element[number-1].classList.add('selected');
+}
 
-  if(element === schemeElements) {
-    scheme = number;
+function handleCodeCopy(index) {
+  const colorCodeElement = colorCodes[index];
+  const colorElement = colorElements[index];
+  const textToCopy = hexCode[index];
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        console.log("Text copied to clipboard:", textToCopy);
+        if (!colorCodeElement.classList.contains('copied')) {
+          colorCodeElement.classList.add('copied');
+          colorCodeElement.innerHTML = 'Copied!';
+          
+          setTimeout(() => {
+            colorCodeElement.classList.remove('copied');
+            colorCodeElement.innerHTML = textToCopy;
+          }, "1200");
+          
+        } else {
+          colorCodeElement.classList.remove('copied');
+          colorCodeElement.innerHTML = textToCopy;
+        }
+      })
+      .catch((err) => {
+        console.error("Unable to copy text to clipboard: ", err);
+      });
+  } else {
+    console.error("Clipboard API is not supported in this browser.");
   }
 }
 
-//Generation Functions
+// Language Switch
+
+const languages = {
+  1: {
+    name: 'Português',
+    flagImage: 'images/pt-br.png',
+    randomBtnText: 'Paleta Aleatória',
+    tipText: 'Pressione \'Espaço\' para gerar',
+    pickerText: 'Cor Principal',
+
+    monoText: 'Monocromático',
+    analogousText: 'Análogo',
+    triadicText: 'Tríade',
+    complementaryText: 'Complementar',
+    splitComplementaryText: 'Meio Complementar',
+    squareText: 'Quadrado',
+    tetradicText: 'Tetrádico',
+    randomText: 'Aleatório'
+  },
+  2: {
+    name: 'English',
+    flagImage: 'images/en.png',
+    randomBtnText: 'Random Palette',
+    tipText: 'Press \'Spacebar\' to generate',
+    pickerText: 'Main Color',
+
+    monoText: 'Monochromatic',
+    analogousText: 'Analogous',
+    triadicText: 'Triadic',
+    complementaryText: 'Complementary',
+    splitComplementaryText: 'Split Complementary',
+    squareText: 'Square',
+    tetradicText: 'Tetradic',
+    randomText: 'Random'
+  }
+};
+
+function switchLanguage(number) {
+let selectedLanguage = languages[number];
+languageDropdownImg.src = selectedLanguage.flagImage;
+
+randomBtn.textContent = selectedLanguage.randomBtnText;
+document.querySelector('#tip p').textContent = selectedLanguage.tipText;
+colorPickerText.textContent = selectedLanguage.pickerText,
+
+document.getElementById('mono').textContent = selectedLanguage.monoText;
+document.getElementById('analogous').textContent = selectedLanguage.analogousText;
+document.getElementById('triadic').textContent = selectedLanguage.triadicText;
+document.getElementById('complementary').textContent = selectedLanguage.complementaryText;
+document.getElementById('split-complementary').textContent = selectedLanguage.splitComplementaryText;
+document.getElementById('square').textContent = selectedLanguage.squareText;
+document.getElementById('tetradic').textContent = selectedLanguage.tetradicText;
+document.getElementById('random').textContent = selectedLanguage.randomText;
+
+currentSchemeText.textContent = schemeElements[scheme - 1].textContent;
+}
+
+// Generation and Schemes Functions
 
 function genPalette() {
-  genCount++;
+ //Add tip
+  tipElement.classList.toggle('on', counters.gen > 4 && counters.tipShown === 0 && !navigator.userAgentData.mobile);
+
   switch(scheme) {
     case 1:
-      genDefault();
+      genMono();
       break;
-
     case 2: 
-      genMono(); 
-      break; 
-
-    case 3:
       genAnalogous();
+      break; 
+    case 3:
+      genTriadic();
       break;
-
     case 4:
+      genComplementary();
       break;
-
     case 5:
+      genSplitComplementary();
+      break;
+    case 6:
+      genSquare();
+      break;
+    case 7:
+      genTetradic();
+      break;
+    case 8:
+      genRandom();
       break;
   }
-  for(i = 0; i < colorQuant; i++) {
-    colorElements[i].style.backgroundColor = `hsl(${hueArray[i]} ${saturationArray[i]}% ${lightnessArray[i]}%)`
 
-    hexCode[i] = hslToHex(hueArray[i] ,saturationArray[i], lightnessArray[i]);
- 
-    colorCode[i].innerHTML = hexCode[i];
-    if(lightnessArray[i] > 60 || 
-      (saturationArray[i] > 70 && lightnessArray[i] > 55) ||
-      (saturationArray[i] > 85 && saturationArray[i] < 92 && lightnessArray[i] > 40)){
-      colorCode[i].style.color = "var(--blacker)";
-      colorCodeP[i] = 0;
-    } else {
-      colorCode[i].style.color = "var(--white)";
-      colorCodeP[i] = 1;
-    }
+  if(scheme > 2 && scheme != 8) {
+    genLSValues();
   }
-  if(genCount > 4 && tipShown === 0 && !navigator.userAgentData.mobile) {
-    tipElement.classList.remove('off');
-    tipElement.classList.add('on');
+
+  for(let i = 0; i < COLOR_QUANT; i++) {
+    const backgroundColor = `hsl(${color[i].hue} ${color[i].saturation}% ${color[i].lightness}%)`
+
+    colorElements[i].style.backgroundColor = backgroundColor
+
+    hexCode[i] = hslToHex(color[i].hue ,color[i].saturation, color[i].lightness); 
+
+    colorCodes[i].textContent = hexCode[i]
+    contrastColor(hexCode[i], colorCodes[i]);
   }
+
+  localStorage.setItem('counters', JSON.stringify(counters));
 }
 
+function genMono() {  
+  color[1].lightness = randomBetween(75, 93);
+  color[2].lightness = randomBetween(50, 75);
+  color[3].lightness = randomBetween(25, 50);
+  color[4].lightness = randomBetween(7, 25);
 
-function genDefault() {
-  for (let i = 0; i < colorQuant; i++) {
-    hueArray[i] = randomBetween(0, 360)
-    saturationArray[i] = randomBetween(0, 100);
-    lightnessArray[i] = randomBetween(0, 100);
-  }
-}
+  let multiplier = 1;
+  for(let i = 1; i < COLOR_QUANT; i++) {
+    color[i].saturation = color[0].saturation * multiplier;
+    multiplier -= 1/(COLOR_QUANT-1);
 
-function genMono() {
-  hueArray[0] = Math.random() * 360;
-  saturationArray[0] = randomBetween(0, 100);
-  let j = colorQuant-1;
-
-  for(let i = 0; i < colorQuant; i++) {
-    let hueDivision = 100/colorQuant;
-    let min = hueDivision * i + 7;
-    let max = hueDivision * (i + 1)
-
-    min = (i === 0) ? min + 3 : min;
-    max = (i === colorQuant-1) ? max - 10 : max;
-
-
-    hueArray[j] = hueArray[0];
-    saturationArray[j] = saturationArray[0];
-    lightnessArray[j] = randomBetween(min, max);
-
-    j--;
+    color[i].hue = color[0].hue;
   }
 }
 
 function genAnalogous() {
-  randomHue = Math.random() * 360;
-  const degreeAdd = 30; //In the color wheel, the variation for each color will be of 30 degrees
-  let curDegrees = degreeAdd;
+  const offsets = [15, 30, -15, -30];
+  const baseHue = color[0].hue;
 
-  saturationArray[0] = randomBetween(40, 70);  
-  lightnessArray[0] = randomBetween(30, 70);
-
-  for(let i = 0; i < colorQuant; i++) {
-    if(randomHue < 0) {
-      randomHue = 360 - randomHue;
-    }
-
-    hueArray[i] = randomHue;
-    randomHue += curDegrees;
-    curDegrees = (curDegrees + degreeAdd) * (-1);
-
-    lightnessArray[i] = lightnessArray[0] + randomBetween(-10, 10);
-    saturationArray[i] = saturationArray[0] + randomBetween(-10, 10);
-  }
-  sort(hueArray);
-}
-
-//Other Button Functions
-
-function toggleHeader(){
-  if(header.classList.contains('on')) {
-    header.classList.remove('on');
-    header.classList.add('off');
-    headerArrowImg.src = 'images/arrowDown.svg';
-  } else {
-    header.classList.remove('off');
-    header.classList.add('on');
-    headerArrowImg.src = 'images/arrowUp.svg';
+  for(i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = (offsets[i-1] + baseHue);
+    color[i].lightness = randomBetween(40, 80);
+    color[i].saturation = color[0].saturation;
   }
 }
 
-document.addEventListener('keyup', event => {
-  if (event.code === 'Space') {
-    genPalette();
-    if(tipElement.classList.contains('on') && spaceCount > 0){
-      tipElement.classList.remove('on');
-      tipElement.classList.add('off');
-      tipShown = 1;
-    }
-    genCount++; 
-    spaceCount++;
-  }
-});
+function genTriadic() { 
+  const offsets = [120, 120, -120, -120];
+  const baseHue = color[0].hue;
 
-function closeTip() {
-  tipElement.classList.remove('on');
-  tipElement.classList.add('off');
-  tipShown = 1;
+  for(i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = (offsets[i-1] + baseHue);
+  }
 }
 
-//Useful Functions
+function genComplementary() {
+  const offsets = [180, 180, 0, 0];
+  const baseHue = color[0].hue;
+
+  for(i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = (offsets[i-1] + baseHue);
+  }
+}
+
+function genSplitComplementary() {
+  const offsets = [-150, -150, 150, 150];
+  const baseHue = color[0].hue;
+
+  for(i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = (offsets[i-1] + baseHue);
+  }
+}
+
+function genSquare() {
+  const offsets = [90, 180, 270, 0];
+  const baseHue = color[0].hue;
+
+  for(i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = (offsets[i-1] + baseHue);
+  }
+}
+
+function genTetradic() {
+  const offsets = [30, 180, -180, 0];
+  const baseHue = color[0].hue;
+
+  for(i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = (offsets[i-1] + baseHue);
+  }
+}
+
+function genRandom() {
+  for (let i = 1; i < COLOR_QUANT; i++) {
+    color[i].hue = randomBetween(0, 360);
+    color[i].lightness = randomBetween(0, 100);
+    color[i].saturation = randomBetween(0, 100);
+  }
+}
+
+function genLSValues() {
+  color[1].lightness = randomBetween(60, 95);
+  color[2].lightness = randomBetween(50, 80);
+  color[3].lightness = randomBetween(45, 70);
+  color[4].lightness = randomBetween(0, 60);
+
+  color[1].saturation = color[0].saturation * (randomBetween(60, 100) / 100);
+  color[2].saturation = color[0].saturation * (randomBetween(50, 90) / 100);
+  color[3].saturation = color[0].saturation * (randomBetween(60, 100) / 100);
+  color[4].saturation = color[0].saturation * (randomBetween(40, 70) / 100);
+}
+
+
+
+
+// Useful Functions
 
 function randomBetween(min, max) {
   return Math.random() * (max - min) + min;
-}
-
-function sort(inputArr) {
-  let n = inputArr.length;
-  for (let i = 1; i < n; i++) {
-    let current = inputArr[i];
-    let j = i-1; 
-    while ((j > -1) && (current < inputArr[j])) {
-      inputArr[j+1] = inputArr[j];
-      j--;
-    }
-    inputArr[j+1] = current;
-  }
-  return inputArr;
 }
 
 function hslToHex(h, s, l) {
@@ -242,3 +422,67 @@ function hslToHex(h, s, l) {
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 }
+
+function hexToHSL(H) {
+  let r = 0, g = 0, b = 0;
+  if (H.length == 4) {
+    r = "0x" + H[1] + H[1];
+    g = "0x" + H[2] + H[2];
+    b = "0x" + H[3] + H[3];
+  } else if (H.length == 7) {
+    r = "0x" + H[1] + H[2];
+    g = "0x" + H[3] + H[4];
+    b = "0x" + H[5] + H[6];
+  }
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  let cmin = Math.min(r,g,b), cmax = Math.max(r,g,b), delta = cmax - cmin;
+  let h = 0, s = 0, l = 0;
+  if (delta == 0)
+    h = 0;
+  else if (cmax == r)
+    h = ((g - b) / delta) % 6;
+  else if (cmax == g)
+    h = (b - r) / delta + 2;
+  else
+    h = (r - g) / delta + 4;
+  h = Math.round(h * 60);
+  if (h < 0)
+    h += 360;
+  l = (cmax + cmin) / 2;
+  s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+  s = +(s * 100).toFixed(1);
+  l = +(l * 100).toFixed(1);
+
+  return [h, s, l];
+}
+
+function contrastColor(hexColor, element){
+  let r = parseInt(hexColor.slice(1, 3), 16);
+  let g = parseInt(hexColor.slice(3, 5), 16);
+  let b = parseInt(hexColor.slice(5, 7), 16);
+
+  // Remove existing classes
+  element.classList.remove("black", "white");
+
+  if (((0.2126 * r + 0.7152 * g + 0.0722 * b) / 255) > 0.5) {
+    element.classList.add("black");
+    return 'black';
+  } else {
+    element.classList.add("white");
+    return 'white';
+  }
+}
+
+/*function setColorQuant() {
+  COLOR_QUANT = colorQuantSelect.value;
+  mainElement.innerHTML = '';
+  for(let i = 0; i < COLOR_QUANT; i++) {
+    mainElement.innerHTML += `<div class = "color">
+    <p class = "code"></p>
+  </div>`;
+  }
+  mainElement.style.gridTemplateColumns = `repeat(${COLOR_QUANT}, 1fr)`;
+  genPalette();
+}*/

@@ -3,67 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg" href="images/logo.svg">
   <link rel="stylesheet" href="styles.css">
   <script src = "index.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <title>Colora</title>
+  <title>Colora &bull; Palette Generator</title>
 </head>
 <body>
-  <header class = "on">
-    <div id="upper">
-      <div id = "title">
-        <img src = "images/logo.svg" class = "logo-img">
+  <div id = "menu">
+    <header>
+      <a href = "index.html" class = "logo">
+        <img src = "images/logo.svg">
         <p>Colora</p>
-      </div>
+      </a>
       <nav>
-
-        <a href = "https://github.com/figueiredoUm">
-          <img class = "github-img" src="images/github.svg">
-          <p></p>
+        <a class = "github" href = "https://github.com/figueiredoUm">
+          <img src="images/github.svg">
         </a>
-
-        <div id = "language-options">
-          <div class = "language" onclick = "switchLanguage(1);">
-            <img src = "images/en.png">
-          </div>
-          <div class = "language" onclick = "switchLanguage(2);">
-            <img src = "images/pt-br.png">
+        <div class = "dropdown" data-dropdown>
+          <a class = "dropdown-language-btn" data-dropdown-btn>
+            <img class = "language-img" src = "images/pt-br.png">
+          </a>
+          <div id = "languages" data-dropdown-content >
+            <button class = "language selected">
+              <img class = "language-img" src = "images/pt-br.png">
+            </button>
+            <button class = "language">
+              <img class = "language-img" src = "images/en.png">
+            </button>
           </div>
         </div>
       </nav>
+    </header>
+
+    <div id="options">
+
+      <div class = "dropdown" data-dropdown>
+        <button class = "dropdown-scheme-btn" data-dropdown-btn>
+            <p>Monocromático</p>
+        </button>
+        <div data-dropdown-content id="schemes">
+          <button id = "mono" class = "scheme selected">Monocromático</button>
+          <button id = "analogous" class = "scheme">Análogo</button>
+          <button id = "triadic" class = "scheme">Tríade</button>
+          <button id = "complementary" class = "scheme">Complementar</button>
+          <button id = "split-complementary" class = "scheme">Meio Complementar</button>
+          <button id = "square" class = "scheme">Quadrado</button>
+          <button id = "tetradic" class = "scheme">Tetrádico</button>
+          <button id = "random" class = "scheme">Aleatório</button>
+        </div>
+      </div>
+
+      <div class = "main-gen">
+        <div id = "color-picker" class = "button">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-color-picker" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M11 7l6 6" />
+            <path d="M4 16l11.7 -11.7a1 1 0 0 1 1.4 0l2.6 2.6a1 1 0 0 1 0 1.4l-11.7 11.7h-4v-4z" />
+          </svg>
+          <p class = "text">Cor principal</p>
+          <input value="#4470d8" type = "color">
+        </div>
+        <button class = "random-btn">
+          <p>Paleta Aleatória</p>
+        </button>
+      </div>
+
     </div>
 
-    <div id="schemes">
+    <!--<select name="color-quantity" id="color-quant" onchange="setColorQuant();">
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>-->
 
-      <select name="color-quantity" id="color-quant" onchange="setColorQuant();">
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-      </select>
+    <img class = "menu-arrow" src = "images/arrowUp.svg">
+  </div>
 
-      <button id = "default" class = "scheme selected" onclick = "select(schemeElements, 1);">Padrão</button>
-      <button id = "mono" class = "scheme" onclick = "select(schemeElements, 2);">Monocromático</button>
-      <button id = "analogous" class = "scheme" onclick = "select(schemeElements, 3);">Análogo</button>
-    </div>
+  
 
-      <a id = "generate-btn" onclick = "genPalette();">Gerar Paleta</a>
-    <img onclick = "toggleHeader();" class = "header-arrow-img" src = "images/arrowUp.svg">
-  </header>
-
-  <div id = "tip" class = "off">
-    <img class = "tip-img" src = "images/tip.svg">
+  <div id = "tip">
     <p>Pressione 'Espaço' para gerar</p>
-    <button id = "close" onclick = "closeTip();">
-      <img class = "close-img" src = "images/close.svg">
-    </button>
+    <img class = "close-tip" src = "images/close.svg">
   </div>
 
   <main id = "main">
     <div class = "color">
-      <p class = "code"></p>
+      <p class = "code" ></p>
     </div>
     <div class = "color">
       <p class = "code"></p>
@@ -72,8 +101,14 @@
       <p class = "code"></p>
     </div>
 
+    <div class = "color">
+      <p class = "code"></p>
+    </div>
+
+    <div class = "color">
+      <p class = "code"></p>
+    </div>
   </main>
-
   
 </body>
 </html>
