@@ -299,7 +299,7 @@ header nav {
 
 /* Main */
 
-#index #main {
+#main {
   display: grid;
   grid-template-columns: repeat(5, 1fr); /*  !  */
   gap: 0;
@@ -385,4 +385,5 @@ header nav {
 .close-tip {
   cursor: pointer;
 }
+
 
