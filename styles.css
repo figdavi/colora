@@ -11,8 +11,37 @@
   --medium: 15px;
   --big: 20px;
 
+  --code-font: 20px
+
   --shadow: 0px 2px 8px hsl(0 0% 0% / 0.3 );
 }
+
+@media (max-width: 550px) {
+  :root {
+    --code-font: 15px;
+  }
+  .color .code::after {
+    content: "";
+    width: var(--big);
+    height: var(--big);
+  }
+  .color .code.copied::after {
+    display: none;
+  }
+}
+
+@media (max-width: 450px) {
+  
+}
+
+@media (max-width: 350px) {
+  :root {
+    --medium: 12px;
+    --big: 15px;
+    --code-font: 10px;
+  }
+}
+
 
 .white {
   color: white;
@@ -34,16 +63,37 @@ img {
 /* Images */
 
 .logo img {
-  width: 40px;
-}
-
-.github img {
-  width: 25px;
+  width: calc(var(--big) * 2);
+  height: calc(var(--big) * 2);
 }
 
 .menu-arrow,
-.language-img {
-  width: 24px;
+.language-img,
+.github img,
+#tip::before {
+  width: calc(var(--big) * 1.2);
+  height: calc(var(--big) * 1.2);
+}
+
+.dropdown-scheme-btn::before,
+.dropdown-scheme-btn::after,
+.random-btn::before,
+.color:hover .code::after {
+  content: "";
+  width: var(--big);
+  height: var(--big);
+}
+
+.dropdown-language-btn::after {
+  content: "";
+  width: var(--medium);
+  height: var(--medium);
+  background-image: url('images/arrowDown.svg');
+}
+
+*::after,
+*::before {
+  background-size: cover; 
 }
 
 .menu-arrow {
@@ -51,33 +101,34 @@ img {
   margin-bottom: 2px;
 }
 
-.dropdown-language-btn::after {
-  content: "";
-  width: 15px;
-  height: 15px;
-  background-image: url('images/arrowDown.svg');
-  background-size: cover; 
-}
-
-.dropdown-scheme-btn::before,
-.dropdown-scheme-btn::after,
-.random-btn::before {
-  width: 20px;
-  height: 20px;
-}
-
 .dropdown-scheme-btn::before{
-  content: url('images/scheme.svg');
+  background-image: url('images/scheme.svg');
 }
 
 .dropdown-scheme-btn::after {
-  content: "";
   background-image: url('images/arrowDown.svg');
-  background-size: cover; 
+  
 }
 
 .random-btn::before {
-  content: url('images/random.svg');
+  background-image: url('images/random.svg');
+}
+
+#tip::before { 
+  content: "";
+  background-image: url('images/tip.svg');
+}
+
+.color:hover .code::after {
+  animation: up-down 0.6s ease-in-out infinite;
+}
+
+.code.white::after {
+  background-image: url('images/copyWhite.svg');
+}
+
+.code.black::after {
+  background-image: url('images/copyBlack.svg');
 }
 
 /* Keyframes */
@@ -192,7 +243,7 @@ header nav {
 #menu #options {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: calc(var(--big * 15));
   gap: 8px;
 }
 
@@ -318,7 +369,7 @@ header nav {
 
 .color .code {
   font-weight: 600;
-  font-size: var(--big);
+  font-size: var(--code-font);
   transition: opacity 0.2s, font-size 0.2s;
   padding: 6px 12px;
   border-radius: 4px;
@@ -330,35 +381,11 @@ header nav {
 }
 
 .color:hover .code {
-  font-size: 22px;
-}
-
-.color:hover .code::after {
-  content: "";
-  width: 18px;
-  height: 18px;
-  background-size: cover;
-  animation: up-down 0.6s ease-in-out infinite;
-  display: none;
-  display: block;
+  font-size: calc(var(--code-font) * 1.1); 
 }
 
 .color:hover .code.copied::after {
   display: none;
-}
-
-
-.code.white::after {
-  background-image: url('images/copyWhite.svg');
-}
-
-.code.black::after {
-  background-image: url('images/copyBlack.svg');
-}
-
-
-#tip::before {
-  content: url('images/tip.svg');
 }
 
 #tip {

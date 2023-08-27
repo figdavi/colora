@@ -188,12 +188,19 @@ function handleCodeCopy(index) {
           
           setTimeout(() => {
             colorCodeElement.classList.remove('copied');
-            colorCodeElement.innerHTML = textToCopy;
+            if(window.innerWidth > 550) {
+              colorCodeElement.innerHTML = textToCopy;
+            } else {
+              colorCodeElement.innerHTML = '';
+            }
           }, "1200");
-          
         } else {
           colorCodeElement.classList.remove('copied');
-          colorCodeElement.innerHTML = textToCopy;
+          if(window.innerWidth > 550) {
+            colorCodeElement.innerHTML = textToCopy;
+          } else {
+            colorCodeElement.innerHTML = '';
+          }
         }
       })
       .catch((err) => {
@@ -304,9 +311,14 @@ function genPalette() {
     colorElements[i].style.backgroundColor = backgroundColor
 
     hexCode[i] = hslToHex(color[i].hue ,color[i].saturation, color[i].lightness); 
-
-    colorCodes[i].textContent = hexCode[i]
     contrastColor(hexCode[i], colorCodes[i]);
+    
+
+    if(window.innerWidth > 550) {
+      
+      colorCodes[i].textContent = hexCode[i]
+    }
+    
   }
 
   localStorage.setItem('counters', JSON.stringify(counters));
