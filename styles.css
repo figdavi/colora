@@ -142,7 +142,7 @@ img {
     transform: translateY(0);
   } 
   50% {
-    transform: translateY(10%);
+    transform: translateY(18%);
   }
   100% {
     transform: translateY(0);
@@ -379,7 +379,7 @@ header nav {
 }
 
 .color:hover .code {
-  font-size: calc(var(--code-font) * 1.12);
+  font-size: calc(var(--code-font) * 1.13);
 }
 
 .color:hover .code.copied::after {
